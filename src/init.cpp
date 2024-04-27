@@ -125,7 +125,7 @@ void VSAC::initialize (int state, Ptr<MinimalSolver> &min_solver, Ptr<NonMinimal
     else CV_Error(cv::Error::StsNotImplemented, "Verifier is not imeplemented!");
 
     if (params.getSampler() == ::vsac::SamplingMethod::SAMPLING_PROSAC) {
-        termination = ProsacTerminationCriteria::create(parallel_call ? nullptr : sampler.dynamicCast<ProsacSampler>(), error,
+        termination = ProsacTerminationCriteria::create(parallel_call ? Ptr<ProsacSampler>() : sampler.dynamicCast<ProsacSampler>(), error,
             points_size, min_sample_size, params.getConfidence(), params.getMaxIters(), 100, 0.05, 0.05, threshold,
             parallel_call ? _termination.dynamicCast<ProsacTerminationCriteria>()->getNonRandomInliers() : std::vector<int>());
     } else if (params.getSampler() == ::vsac::SamplingMethod::SAMPLING_PROGRESSIVE_NAPSAC) {
@@ -187,7 +187,7 @@ VSAC::VSAC (const ::vsac::Params &params_, cv::InputArray points1, cv::InputArra
             K1 = K1_.getMat(); K1.convertTo(K1, CV_64F);
             if (! dist_coeff1.empty()) {
                 // undistortPoints also calibrate points using K
-                undistortPoints(points1.isContinuous() ? points1 : points1.getMat().clone(), undist_points1, K1_, dist_coeff1);
+                cv::fisheye::undistortPoints(points1.isContinuous() ? points1 : points1.getMat().clone(), undist_points1, K1_, dist_coeff1);
                 points_size = mergePoints(undist_points1, points2, points, true);
                 Utils::normalizeAndDecalibPointsPnP (K1, points, calib_points);
             } else {
@@ -202,9 +202,9 @@ VSAC::VSAC (const ::vsac::Params &params_, cv::InputArray points1, cv::InputArra
             K2 = K2_.getMat(); K2.convertTo(K2, CV_64F);            
             if (! dist_coeff1.empty() || ! dist_coeff2.empty()) {
                 // undistortPoints also calibrate points using K
-                if (! dist_coeff1.empty()) undistortPoints(points1.isContinuous() ? points1 : points1.getMat().clone(), undist_points1, K1_, dist_coeff1);
+                if (! dist_coeff1.empty()) cv::fisheye::undistortPoints(points1.isContinuous() ? points1 : points1.getMat().clone(), undist_points1, K1_, dist_coeff1);
                 else undist_points1 = points1.getMat();
-                if (! dist_coeff2.empty()) undistortPoints(points2.isContinuous() ? points2 : points2.getMat().clone(), undist_points2, K2_, dist_coeff2);
+                if (! dist_coeff2.empty()) cv::fisheye::undistortPoints(points2.isContinuous() ? points2 : points2.getMat().clone(), undist_points2, K2_, dist_coeff2);
                 else undist_points2 = points2.getMat();
                 points_size = mergePoints(undist_points1, undist_points2, calib_points, false);
             } else {

@@ -114,7 +114,7 @@ Ptr<HomographySVDSolver> HomographySVDSolver::create(const Mat &points_) {
 class HomographyNonMinimalSolverImpl : public HomographyNonMinimalSolver {
 private:
     const Mat * points_mat;
-    Ptr<NormTransform> normTr = nullptr;
+    Ptr<NormTransform> normTr = Ptr<NormTransform>();
     Matx33d _T1, _T2;
 public:
     explicit HomographyNonMinimalSolverImpl (const Mat &norm_points_, const Matx33d &T1, const Matx33d &T2) :
@@ -285,7 +285,7 @@ Ptr<AffineMinimalSolver> AffineMinimalSolver::create(const Mat &points_) {
 class AffineNonMinimalSolverImpl : public AffineNonMinimalSolver {
 private:
     const Mat * points_mat;
-    Ptr<NormTransform> normTr = nullptr;
+    Ptr<NormTransform> normTr = Ptr<NormTransform>();
     Matx33d _T1, _T2;
 public:
     explicit AffineNonMinimalSolverImpl (const Mat &points_, InputArray T1, InputArray T2) :
